@@ -1,6 +1,7 @@
-package com.android.jhcalendarpoject.compose
+package com.android.jhcalendarpoject.data.local
 
-import androidx.compose.ui.platform.LocalContext
+import com.android.jhcalendarpoject.R
+
 const val CALENDAR = "CALENDAR"
 const val BOARD = "BOARD"
 const val MEMO = "MEMO"

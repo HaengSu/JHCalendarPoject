@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.android.jhcalendarpoject.compose.BoardPage
+import com.android.jhcalendarpoject.data.local.BottomNavItem
 
 
 @Composable
@@ -14,7 +14,7 @@ fun NavigationGraph(navCon : NavHostController) {
             CalendarPage()
         }
         composable(BottomNavItem.Board.screenRoute) {
-            BoardPage()
+            PhotoPage()
         }
         composable(BottomNavItem.Memo.screenRoute) {
             MemoPage()
