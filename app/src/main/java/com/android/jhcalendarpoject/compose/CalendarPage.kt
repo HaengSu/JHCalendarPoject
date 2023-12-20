@@ -1,6 +1,7 @@
 package com.android.jhcalendarpoject.compose
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,8 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.jhcalendarpoject.R
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarPage() {
     Column {
@@ -75,8 +79,17 @@ fun CalendarPage() {
     }
 }
 
+
 @Composable
 fun CustomCalendarHeader() {
+    val year = LocalDate.now().year
+    val month = LocalDate.now().monthValue
+    val formatter = SimpleDateFormat("MMM", Locale.US)
+    val monthName = formatter.format(month)
+
+    val day = LocalDate.now().dayOfMonth
+
+
     Column {
         // 년월 표시 라인
         Row(
@@ -90,7 +103,7 @@ fun CustomCalendarHeader() {
                 contentDescription = "arrowLeft"
             )
 
-            Text(text = "2021 Jul")
+            Text(text = "${year} ${monthName}")
 
             Image(
                 painter = painterResource(id = R.drawable.image_arrow_right),
@@ -128,6 +141,7 @@ fun CustomCalendarHeader() {
 
         //날짜 표시 라인
         CustomCalendarBody()
+        //https://velog.io/@abh0920one/Compose-Custom-Calendar-%EC%A0%9C%EC%9E%91%ED%95%98%EA%B8%B0 참고
     }
 }
 
@@ -186,48 +200,48 @@ fun CalendarDay(
     isSelected: Boolean,
     onSelectedDate: (LocalDate) -> Unit
 ) {
-    val hasEvent = false // TODO
-    Column(
-        modifier = modifier
-            .wrapContentSize()
-            .size(30.dp)
-            .clip(shape = RoundedCornerShape(10.dp))
-            .conditional(isToday) {
-                background(gray07)
-            }
-            .conditional(isSelected) {
-                background(gray0)
-            }
-            .conditional(!isToday && !isSelected) {
-                background(gray08)
-            }
-            .noRippleClickable { onSelectedDate(date) },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-
-    ) {
-        val textColor = if (isSelected) gray09 else gray0
-        Text(
-            modifier = Modifier,
-            textAlign = TextAlign.Center,
-            text = date.dayOfMonth.toString(),
-            style = BoldN12,
-            color = textColor
-        )
-        if (hasEvent) {
-            Box(
-                modifier = Modifier
-                    .size(4.dp)
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .conditional(isSelected) {
-                        background(gray09)
-                    }
-                    .conditional(!isSelected) {
-                        background(gray0)
-                    }
-            )
-        }
-    }
+//    val hasEvent = false // TODO
+//    Column(
+//        modifier = modifier
+//            .wrapContentSize()
+//            .size(30.dp)
+//            .clip(shape = RoundedCornerShape(10.dp))
+//            .conditional(isToday) {
+//                background(gray07)
+//            }
+//            .conditional(isSelected) {
+//                background(gray0)
+//            }
+//            .conditional(!isToday && !isSelected) {
+//                background(gray08)
+//            }
+//            .noRippleClickable { onSelectedDate(date) },
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+//
+//    ) {
+//        val textColor = if (isSelected) gray09 else gray0
+//        Text(
+//            modifier = Modifier,
+//            textAlign = TextAlign.Center,
+//            text = date.dayOfMonth.toString(),
+//            style = BoldN12,
+//            color = textColor
+//        )
+//        if (hasEvent) {
+//            Box(
+//                modifier = Modifier
+//                    .size(4.dp)
+//                    .clip(shape = RoundedCornerShape(4.dp))
+//                    .conditional(isSelected) {
+//                        background(gray09)
+//                    }
+//                    .conditional(!isSelected) {
+//                        background(gray0)
+//                    }
+//            )
+//        }
+//    }
 }
 
 @Preview
