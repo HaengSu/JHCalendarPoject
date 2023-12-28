@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,6 +81,7 @@ fun CalendarPage() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomCalendarHeader() {
     val year = LocalDate.now().year
@@ -140,7 +142,14 @@ fun CustomCalendarHeader() {
         }
 
         //날짜 표시 라인
-        CustomCalendarBody()
+        CustomCalendarBody(
+            modifier = Modifier.fillMaxWidth(),
+            currentDate = LocalDate.now(),
+            selectedDate = LocalDate.now(),
+            onSelectedDate = {
+
+            }
+        )
         //https://velog.io/@abh0920one/Compose-Custom-Calendar-%EC%A0%9C%EC%9E%91%ED%95%98%EA%B8%B0 참고
     }
 }
@@ -159,22 +168,21 @@ fun CustomCalendarBody(
     val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
     val firstDayOfWeek by remember { mutableStateOf(currentDate.dayOfWeek.value) }
     val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
-    Column {
+    Log.i("##INFO", "lastDay = ${lastDay} , firstDayOfWeek = ${firstDayOfWeek} , days = ${days}, currentDate = ${currentDate}")
+    Column(modifier = modifier ){
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
             columns = GridCells.Fixed(7)
         ) {
-            for (i in 1 until firstDayOfWeek) {
+            for (i in 1 until firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
                 item {
-                    Box (
+                    Box(
                         modifier = Modifier
                             .size(30.dp)
                             .padding(top = 10.dp)
-
                     )
                 }
             }
-
             items(days) { day ->
                 val date = currentDate.withDayOfMonth(day)
                 val isSelected = remember(selectedDate) {
@@ -192,6 +200,7 @@ fun CustomCalendarBody(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarDay(
     modifier: Modifier = Modifier,
@@ -200,50 +209,25 @@ fun CalendarDay(
     isSelected: Boolean,
     onSelectedDate: (LocalDate) -> Unit
 ) {
-//    val hasEvent = false // TODO
-//    Column(
-//        modifier = modifier
-//            .wrapContentSize()
-//            .size(30.dp)
-//            .clip(shape = RoundedCornerShape(10.dp))
-//            .conditional(isToday) {
-//                background(gray07)
-//            }
-//            .conditional(isSelected) {
-//                background(gray0)
-//            }
-//            .conditional(!isToday && !isSelected) {
-//                background(gray08)
-//            }
-//            .noRippleClickable { onSelectedDate(date) },
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//
-//    ) {
-//        val textColor = if (isSelected) gray09 else gray0
-//        Text(
-//            modifier = Modifier,
-//            textAlign = TextAlign.Center,
-//            text = date.dayOfMonth.toString(),
-//            style = BoldN12,
-//            color = textColor
-//        )
-//        if (hasEvent) {
-//            Box(
-//                modifier = Modifier
-//                    .size(4.dp)
-//                    .clip(shape = RoundedCornerShape(4.dp))
-//                    .conditional(isSelected) {
-//                        background(gray09)
-//                    }
-//                    .conditional(!isSelected) {
-//                        background(gray0)
-//                    }
-//            )
-//        }
-//    }
+    Column(
+        modifier = modifier
+            .wrapContentSize()
+            .size(30.dp)
+            .clip(shape = RoundedCornerShape(10.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+
+    ) {
+        Text(
+            modifier = Modifier,
+            textAlign = TextAlign.Center,
+            text = date.dayOfMonth.toString(),
+            color = colorResource(id = R.color.purple_500)
+        )
+    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewCalendarPage() {
