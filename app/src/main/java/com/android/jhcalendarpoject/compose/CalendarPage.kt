@@ -42,6 +42,7 @@ import com.android.jhcalendarpoject.R
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Locale
+import kotlin.time.Duration.Companion.days
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -166,15 +167,16 @@ fun CustomCalendarBody(
     onSelectedDate: (LocalDate) -> Unit
 ) {
     val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
-    val firstDayOfWeek by remember { mutableStateOf(currentDate.dayOfWeek.value) }
+    val firstDayOfWeek by remember { mutableStateOf((currentDate.dayOfWeek.value +1) %7) }
     val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
     Log.i("##INFO", "lastDay = ${lastDay} , firstDayOfWeek = ${firstDayOfWeek} , days = ${days}, currentDate = ${currentDate}")
+    Log.i("##INFO", "currentDate.dayOfWeek.value = ${currentDate.dayOfWeek.ordinal+1}")
     Column(modifier = modifier ){
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
             columns = GridCells.Fixed(7)
         ) {
-            for (i in 1 until firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
+            for (i in 1 .. firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
                 item {
                     Box(
                         modifier = Modifier
