@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.android.jhcalendarpoject.R
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.time.Duration.Companion.days
 
@@ -81,16 +82,17 @@ fun CalendarPage() {
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomCalendarHeader() {
     val year = LocalDate.now().year
     val month = LocalDate.now().monthValue
-    val formatter = SimpleDateFormat("MMM", Locale.US)
-    val monthName = formatter.format(month)
+    val formatter = DateTimeFormatter.ofPattern("MMM", Locale.US)
+    val monthName = formatter.format(LocalDate.now())
+    Log.i("##INFO", "monthName =${monthName}")
 
     val day = LocalDate.now().dayOfMonth
+
 
 
     Column {
@@ -170,7 +172,7 @@ fun CustomCalendarBody(
     val firstDayOfWeek by remember { mutableStateOf((currentDate.dayOfWeek.value +1) %7) }
     val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
     Log.i("##INFO", "lastDay = ${lastDay} , firstDayOfWeek = ${firstDayOfWeek} , days = ${days}, currentDate = ${currentDate}")
-    Log.i("##INFO", "currentDate.dayOfWeek.value = ${currentDate.dayOfWeek.ordinal+1}")
+//    Log.i("##INFO", "currentDate.dayOfWeek.value = ${currentDate.dayOfWeek.ordinal+1}")
     Column(modifier = modifier ){
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
@@ -233,5 +235,7 @@ fun CalendarDay(
 @Preview
 @Composable
 fun PreviewCalendarPage() {
-    CalendarPage()
+    Row(modifier = Modifier.background(color = colorResource(id = R.color.white))) {
+        CalendarPage()
+    }
 }
