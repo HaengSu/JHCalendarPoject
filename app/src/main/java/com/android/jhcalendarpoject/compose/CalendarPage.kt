@@ -89,10 +89,7 @@ fun CustomCalendarHeader() {
     val month = LocalDate.now().monthValue
     val formatter = DateTimeFormatter.ofPattern("MMM", Locale.US)
     val monthName = formatter.format(LocalDate.now())
-    Log.i("##INFO", "monthName =${monthName}")
-
     val day = LocalDate.now().dayOfMonth
-
 
 
     Column {
@@ -148,7 +145,6 @@ fun CustomCalendarHeader() {
         CustomCalendarBody(
             modifier = Modifier.fillMaxWidth(),
             currentDate = LocalDate.of(2024, 1, 28),
-//            currentDate = LocalDate.now(),
             selectedDate = LocalDate.now(),
             onSelectedDate = {
             }
