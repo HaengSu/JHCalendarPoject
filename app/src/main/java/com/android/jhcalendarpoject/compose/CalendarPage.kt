@@ -88,7 +88,8 @@ fun CustomCalendarHeader() {
     val year = LocalDate.now().year
     val month = LocalDate.now().monthValue
     val formatter = DateTimeFormatter.ofPattern("MMM", Locale.US)
-    val monthName = formatter.format(LocalDate.now())
+//    val monthName = formatter.format(LocalDate.now())
+    val monthName = formatter.format(LocalDate.of(2023, 12, 28))
     Log.i("##INFO", "monthName =${monthName}")
 
     val day = LocalDate.now().dayOfMonth
@@ -144,13 +145,13 @@ fun CustomCalendarHeader() {
         ) {
         }
 
-        //날짜 표시 라인
+        //날짜 표시 라인2
         CustomCalendarBody(
             modifier = Modifier.fillMaxWidth(),
-            currentDate = LocalDate.now(),
+//            currentDate = LocalDate.now(),
+            currentDate = LocalDate.of(2023, 10, 28),
             selectedDate = LocalDate.now(),
             onSelectedDate = {
-
             }
         )
         //https://velog.io/@abh0920one/Compose-Custom-Calendar-%EC%A0%9C%EC%9E%91%ED%95%98%EA%B8%B0 참고
@@ -169,10 +170,11 @@ fun CustomCalendarBody(
     onSelectedDate: (LocalDate) -> Unit
 ) {
     val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
-    val firstDayOfWeek by remember { mutableStateOf((currentDate.dayOfWeek.value +1) %7) }
+    val firstDayOfWeek by remember { mutableStateOf((currentDate.dayOfWeek.value)) }
     val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
-    Log.i("##INFO", "lastDay = ${lastDay} , firstDayOfWeek = ${firstDayOfWeek} , days = ${days}, currentDate = ${currentDate}")
-//    Log.i("##INFO", "currentDate.dayOfWeek.value = ${currentDate.dayOfWeek.ordinal+1}")
+
+    Log.i("##INFO", "curDate = ${currentDate}  // firstDayOfMonth = ${currentDate.withDayOfMonth(1).dayOfWeek}" +
+            "firstDay Position = ${currentDate.withDayOfMonth(1).dayOfWeek.value} " )
     Column(modifier = modifier ){
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
