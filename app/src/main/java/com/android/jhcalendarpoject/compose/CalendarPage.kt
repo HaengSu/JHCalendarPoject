@@ -88,8 +88,7 @@ fun CustomCalendarHeader() {
     val year = LocalDate.now().year
     val month = LocalDate.now().monthValue
     val formatter = DateTimeFormatter.ofPattern("MMM", Locale.US)
-//    val monthName = formatter.format(LocalDate.now())
-    val monthName = formatter.format(LocalDate.of(2023, 12, 28))
+    val monthName = formatter.format(LocalDate.now())
     Log.i("##INFO", "monthName =${monthName}")
 
     val day = LocalDate.now().dayOfMonth
@@ -148,8 +147,8 @@ fun CustomCalendarHeader() {
         //날짜 표시 라인2
         CustomCalendarBody(
             modifier = Modifier.fillMaxWidth(),
+            currentDate = LocalDate.of(2024, 1, 28),
 //            currentDate = LocalDate.now(),
-            currentDate = LocalDate.of(2023, 10, 28),
             selectedDate = LocalDate.now(),
             onSelectedDate = {
             }
@@ -170,17 +169,23 @@ fun CustomCalendarBody(
     onSelectedDate: (LocalDate) -> Unit
 ) {
     val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
-    val firstDayOfWeek by remember { mutableStateOf((currentDate.dayOfWeek.value)) }
+
+    // 일요일이 1부터 사작할 수 있게 +1, %7 적용  토요일은 0이 되므로 if문 처리
+    var firstDayOfMonth = (currentDate.withDayOfMonth(1).dayOfWeek.value + 1) % 7
+    if (firstDayOfMonth == 0) {
+        firstDayOfMonth = 7
+    }
+    val firstDayOfWeek by remember { mutableStateOf(firstDayOfMonth)}
     val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
 
-    Log.i("##INFO", "curDate = ${currentDate}  // firstDayOfMonth = ${currentDate.withDayOfMonth(1).dayOfWeek}" +
-            "firstDay Position = ${currentDate.withDayOfMonth(1).dayOfWeek.value} " )
+    Log.i("##INFO", "firstdayofweek = ${firstDayOfWeek}")
+
     Column(modifier = modifier ){
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
             columns = GridCells.Fixed(7)
         ) {
-            for (i in 1 .. firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
+            for (i in 1 until firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
                 item {
                     Box(
                         modifier = Modifier
