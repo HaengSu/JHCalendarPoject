@@ -2,6 +2,7 @@ package com.android.jhcalendarpoject.compose
 
 import android.os.Build
 import android.util.Log
+import android.widget.ImageButton
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -91,6 +93,10 @@ fun CustomCalendarHeader() {
     val monthName = formatter.format(LocalDate.now())
     val day = LocalDate.now().dayOfMonth
 
+    LaunchedEffect(month) {
+        Log.i("##INFO", "month = ${month}")
+    }
+
 
     Column {
         // 년월 표시 라인
@@ -100,7 +106,7 @@ fun CustomCalendarHeader() {
                 .fillMaxWidth()
                 .padding(top = 19.dp)
         ) {
-            Image(
+            ImageButton(
                 painter = painterResource(id = R.drawable.image_arrow_left),
                 contentDescription = "arrowLeft"
             )
