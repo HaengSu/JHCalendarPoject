@@ -24,13 +24,18 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.android.jhcalendarpoject.R
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.time.Duration.Companion.days
@@ -87,14 +93,16 @@ fun CalendarPage() {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CustomCalendarHeader() {
-    val year = LocalDate.now().year
-    val month = LocalDate.now().monthValue
+    var year by rememberSaveable {
+        mutableStateOf(LocalDate.now().year)
+    }
+    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
     val formatter = DateTimeFormatter.ofPattern("MMM", Locale.US)
-    val monthName = formatter.format(LocalDate.now())
+    var monthName by remember { mutableStateOf(formatter.format(LocalDate.now())) }
     val day = LocalDate.now().dayOfMonth
 
-    LaunchedEffect(month) {
-        Log.i("##INFO", "month = ${month}")
+    LaunchedEffect(currentMonth) {
+        Log.i("##INFO", "month = ${currentMonth}")
     }
 
 
@@ -106,17 +114,35 @@ fun CustomCalendarHeader() {
                 .fillMaxWidth()
                 .padding(top = 19.dp)
         ) {
-            ImageButton(
-                painter = painterResource(id = R.drawable.image_arrow_left),
-                contentDescription = "arrowLeft"
-            )
+            IconButton(
+                onClick = {
+                    val beforeMonth = currentMonth.minusMonths(1)
+                    currentMonth = beforeMonth
+                    year = beforeMonth.year
+                    monthName = formatter.format(beforeMonth)
+                },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.image_arrow_left),
+                    contentDescription = "arrowLeft"
+                )
+            }
 
             Text(text = "${year} ${monthName}")
 
-            Image(
-                painter = painterResource(id = R.drawable.image_arrow_right),
-                contentDescription = "arrowRight"
-            )
+            IconButton(
+                onClick = {
+                    val nextMonth = currentMonth.plusMonths(1)
+                    currentMonth = nextMonth
+                    year = nextMonth.year
+                    monthName = formatter.format(nextMonth)
+                },
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.image_arrow_right),
+                    contentDescription = "arrowLeft"
+                )
+            }
 
         }
 
@@ -150,7 +176,7 @@ fun CustomCalendarHeader() {
         //날짜 표시 라인2
         CustomCalendarBody(
             modifier = Modifier.fillMaxWidth(),
-            currentDate = LocalDate.of(2024, 1, 28),
+            currentDate = currentMonth.atDay(1),
             selectedDate = LocalDate.now(),
             onSelectedDate = {
             }
@@ -170,32 +196,48 @@ fun CustomCalendarBody(
     selectedDate: LocalDate,
     onSelectedDate: (LocalDate) -> Unit
 ) {
-    val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
+    val lastDay = currentDate.month.length(currentDate.isLeapYear)
 
     // 일요일이 1부터 사작할 수 있게 +1, %7 적용  토요일은 0이 되므로 if문 처리
     var firstDayOfMonth = (currentDate.withDayOfMonth(1).dayOfWeek.value + 1) % 7
     if (firstDayOfMonth == 0) {
         firstDayOfMonth = 7
     }
-    val firstDayOfWeek by remember { mutableStateOf(firstDayOfMonth)}
-    val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
+    val firstDayOfWeek = firstDayOfMonth
+    val days  = IntRange(1, lastDay).toList()
 
-    Log.i("##INFO", "firstdayofweek = ${firstDayOfWeek}")
-
-    Column(modifier = modifier ){
+    Column(modifier = modifier) {
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
             columns = GridCells.Fixed(7)
         ) {
-            for (i in 1 until firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
+
+            // TODO: 1/09 0부터 시작해서 한칸씩 밀렸음  수정 필요함 
+            // 처음 날짜가 시작하는 요일 전까지 전 달의 날짜로 표시
+            for (i in 0 until firstDayOfWeek) {
+                val beforeMonth = currentDate.minusMonths(1)
+                val lastDate = beforeMonth.month.length(beforeMonth.isLeapYear) - (firstDayOfMonth - i)
                 item {
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
+                    Column(
+                        modifier = modifier
                             .padding(top = 10.dp)
-                    )
+                            .wrapContentSize()
+                            .size(30.dp)
+                            .clip(shape = RoundedCornerShape(10.dp)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            modifier = Modifier,
+                            textAlign = TextAlign.Center,
+                            text = lastDate.toString(),
+                            color = colorResource(id = R.color.gray_200 )
+                        )
+                    }
                 }
             }
+            Log.i("##INFO", "day = ${days}");
+
             items(days) { day ->
                 val date = currentDate.withDayOfMonth(day)
                 val isSelected = remember(selectedDate) {
@@ -209,6 +251,15 @@ fun CustomCalendarBody(
                     onSelectedDate = onSelectedDate
                 )
             }
+
+            // 마지막 날짜가 끝나고 나머지 날짜는 다음 달의 날짜로 표시
+            // 1. 마지막주의 날짜가 7일이 아닐 경우
+//            var lastDayOfWeek = currentDate.withDayOfMonth(lastDay).dayOfWeek.value +1 % 7
+//            if (lastDayOfWeek == 0) {
+//                lastDayOfWeek = 7
+//            }
+//            Log.i("##INFO", "lastDayOfWeek = ${lastDayOfWeek}")
+
         }
     }
 }
@@ -235,7 +286,7 @@ fun CalendarDay(
             modifier = Modifier,
             textAlign = TextAlign.Center,
             text = date.dayOfMonth.toString(),
-            color = colorResource(id = R.color.purple_500)
+            color = colorResource(id = R.color.black )
         )
     }
 }
