@@ -196,16 +196,15 @@ fun CustomCalendarBody(
     selectedDate: LocalDate,
     onSelectedDate: (LocalDate) -> Unit
 ) {
-    val lastDay by remember { mutableStateOf(currentDate.lengthOfMonth()) }
-    Log.i("##INFO", "currenData= ${currentDate}  // lastDay = ${lastDay}")
+    val lastDay = currentDate.month.length(currentDate.isLeapYear)
 
     // 일요일이 1부터 사작할 수 있게 +1, %7 적용  토요일은 0이 되므로 if문 처리
     var firstDayOfMonth = (currentDate.withDayOfMonth(1).dayOfWeek.value + 1) % 7
     if (firstDayOfMonth == 0) {
         firstDayOfMonth = 7
     }
-    val firstDayOfWeek by remember { mutableStateOf(firstDayOfMonth) }
-    val days by remember { mutableStateOf(IntRange(1, lastDay).toList()) }
+    val firstDayOfWeek = firstDayOfMonth
+    val days  = IntRange(1, lastDay).toList()
 
     Log.i("##INFO", "firstdayofweek = ${firstDayOfWeek}")
 
