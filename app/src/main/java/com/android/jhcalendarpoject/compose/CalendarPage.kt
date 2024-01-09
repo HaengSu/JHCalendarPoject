@@ -206,23 +206,38 @@ fun CustomCalendarBody(
     val firstDayOfWeek = firstDayOfMonth
     val days  = IntRange(1, lastDay).toList()
 
-    Log.i("##INFO", "firstdayofweek = ${firstDayOfWeek}")
-
     Column(modifier = modifier) {
         LazyVerticalGrid(
             modifier = Modifier.height(260.dp),
             columns = GridCells.Fixed(7)
         ) {
-            for (i in 1 until firstDayOfWeek) { // 처음 날짜가 시작하는 요일 전까지 빈 박스 생성
+
+            // TODO: 1/09 0부터 시작해서 한칸씩 밀렸음  수정 필요함 
+            // 처음 날짜가 시작하는 요일 전까지 전 달의 날짜로 표시
+            for (i in 0 until firstDayOfWeek) {
+                val beforeMonth = currentDate.minusMonths(1)
+                val lastDate = beforeMonth.month.length(beforeMonth.isLeapYear) - (firstDayOfMonth - i)
                 item {
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
+                    Column(
+                        modifier = modifier
                             .padding(top = 10.dp)
-                    )
+                            .wrapContentSize()
+                            .size(30.dp)
+                            .clip(shape = RoundedCornerShape(10.dp)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            modifier = Modifier,
+                            textAlign = TextAlign.Center,
+                            text = lastDate.toString(),
+                            color = colorResource(id = R.color.gray_200 )
+                        )
+                    }
                 }
             }
             Log.i("##INFO", "day = ${days}");
+
             items(days) { day ->
                 val date = currentDate.withDayOfMonth(day)
                 val isSelected = remember(selectedDate) {
@@ -236,6 +251,15 @@ fun CustomCalendarBody(
                     onSelectedDate = onSelectedDate
                 )
             }
+
+            // 마지막 날짜가 끝나고 나머지 날짜는 다음 달의 날짜로 표시
+            // 1. 마지막주의 날짜가 7일이 아닐 경우
+//            var lastDayOfWeek = currentDate.withDayOfMonth(lastDay).dayOfWeek.value +1 % 7
+//            if (lastDayOfWeek == 0) {
+//                lastDayOfWeek = 7
+//            }
+//            Log.i("##INFO", "lastDayOfWeek = ${lastDayOfWeek}")
+
         }
     }
 }
@@ -262,7 +286,7 @@ fun CalendarDay(
             modifier = Modifier,
             textAlign = TextAlign.Center,
             text = date.dayOfMonth.toString(),
-            color = colorResource(id = R.color.purple_500)
+            color = colorResource(id = R.color.black )
         )
     }
 }
